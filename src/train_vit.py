@@ -1,9 +1,16 @@
 import torch # https://pytorch.org/docs/stable/index.html
 import torchvision # https://pytorch.org/vision/stable/index.html
 from torch.utils.data import DataLoader
+from torch.nn.utils.rnn import pad_sequence
 import matplotlib.pyplot as plt
 
-
+def collate_fn(data):
+    print(type(data))
+    print(len(data))
+    tensors, targets = zip(*data)
+    features = pad_sequence(tensors, batch_first=True)
+    targets = torch.stack(targets)
+    return features, targets
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -17,7 +24,7 @@ if __name__ == "__main__":
     print('Number of train images:', len(test_dataset))
     print('Number of test images:', len(train_dataset))
     
-    train_dataloader = DataLoader(train_dataset, batch_size=2, shuffle=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=4, collate_fn=collate_fn, shuffle=True)
     test_dataloader = DataLoader(test_dataset, shuffle=True)
     print(train_dataloader)
     print(test_dataloader)
