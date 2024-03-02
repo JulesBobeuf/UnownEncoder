@@ -12,19 +12,16 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)  
     
-    transform = torchvision.transforms.Compose([torchvision.transforms.Resize((64, 64)), torchvision.transforms.ToTensor(), torchvision.transforms.Normalize(0.5, std=0.5)])
+    transform = torchvision.transforms.Compose([torchvision.transforms.Resize((28, 28)), torchvision.transforms.Normalize(0.5, std=0.5)])
     print(transform) 
     
-    test_dataset = UnownDataset(csv_file="./data/test/description.csv", root_dir="./data/test/", transform=transform)
+    test_dataset = UnownDataset("./data/X_test.npy", "./data/Y_test.npy", transform=transform)
     print('Number of train images:', len(test_dataset))
     
     test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
     print(test_dataloader)
     
-    #display_all_images(batch_size, train_dataloader)
-    
-    
-    model = ViT(image_size=64, channel_size=1, patch_size=4, embed_size=64, nb_heads=8, classes=10, nb_layers=7, hidden_size=256, dropout=0.05).to(device)
+    model = ViT(image_size=28, channel_size=1, patch_size=4, embed_size=512, nb_heads=8, classes=28, nb_layers=3, hidden_size=256, dropout=0.2).to(device)
     model.load_state_dict(state_dict=torch.load('./model_save.pt'))
     print(model)
     
@@ -43,12 +40,11 @@ if __name__ == "__main__":
         y_test_true = []
 
         # Boucle permettant de parcourir l'ensemble des données du DataLoader de test (les 10000 images !)
-        for batch_idx, data in enumerate(test_dataloader):          
+        for batch_idx, (imgs, labels, tensor_labels) in enumerate(test_dataloader):
+  
             # Envoi des données sur le processeur choisi (CPU ou GPU)
-            imgs = data[0].to(device)
-            label_to_index = {label: index for index, label in enumerate(set(data[1]))}
-            # Convert string labels to tensor format
-            labels = torch.tensor([label_to_index[label] for label in data[1]]).to(device)
+            imgs = imgs.to(device)
+            tensor_labels = tensor_labels.to(device)
 
             # Passage du batch d'images dans le modèle ViT conçu
             # On obtient les prédictions directement en sortie
@@ -59,7 +55,7 @@ if __name__ == "__main__":
             # L'indice de la probabilité la plus forte correspond au chiffre prédit par le réseau !
             # On ajoute les prédictions et les valeurs à prédire dans les listes correspondantes
             y_test_pred.extend(predictions.detach().max(1)[1].tolist()) # Compléter ici (indice : on veut l'indice de la valeur maximale des éléments du tenseur pour chaque batch, une fonction PyTorch existe pour cela !)
-            y_test_true.extend(labels.detach().tolist())
+            y_test_true.extend(tensor_labels.detach().tolist())
 
         # Vérification et calcul de la précision du modèle en comparant pour chaque image son label avec la valeur prédite
         nb_imgs = len(y_test_pred)

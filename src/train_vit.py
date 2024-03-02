@@ -11,38 +11,31 @@ def display_all_images(batch_size, train_dataloader):
     cols = 7  # Number of columns in the subplot grid
     fig = plt.figure(figsize=(10, 10))
 
-    for batch_idx, data in enumerate(train_dataloader):
-        #print(f'Batch {batch_idx}, Number of images: {len(data[0])}, Labels: {data[1]}')
-        
-        """ print('Images:', data[0].shape)
-        b, c, h, w = data[0].shape
-        print('Batch(s):', b) # 1 images traitées à la fois
-        print('Channel(s):', c) # 3 seul canal de couleur car c'est une image en noir et blanc (3 canaux si c'était une image RGB)
-        print('Height:', h) # 64 pixels de hauteur
-        print('Width:', w) # 64 pixels de largeur
-        print('Labels:', data[1].shape) # 1 label
-        print(data[1]) """
-    
+    incr = 0
+    for batch_idx, (imgs, labels, tensor_labels) in enumerate(train_dataloader):
         for i in range(batch_size):
             plt.subplot(rows, cols, batch_idx * batch_size + i + 1)
             plt.tight_layout()
-            plt.imshow(data[0][i][0], cmap='gray', interpolation='none')
-            plt.title(f'Label: {data[1][i]}')
+            plt.imshow(imgs[i][0], cmap='gray', interpolation='none')
+            plt.title(f'Label: {labels[i]}')
             plt.xticks([])
             plt.yticks([])
         
+        incr += 1
+        if (incr > 10): 
+            break
     plt.show()
 
 if __name__ == "__main__":
-    batch_size = 10
+    batch_size = 4
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)  
     
-    transform = torchvision.transforms.Compose([torchvision.transforms.Resize((64, 64)), torchvision.transforms.ToTensor(), torchvision.transforms.Normalize(0.5, std=0.5)])
+    transform = torchvision.transforms.Compose([torchvision.transforms.Resize((28, 28)), torchvision.transforms.Normalize(0.5, std=0.5)])
     print(transform) 
     
-    train_dataset = UnownDataset(csv_file="./data/train/description.csv", root_dir="./data/train/", transform=transform)
-    print('Number of test images:', len(train_dataset))
+    train_dataset = UnownDataset("./data/X_train.npy", "./data/Y_train.npy", transform=transform)
+    print('Number of train images:', len(train_dataset))
     
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     print(train_dataloader)
@@ -50,18 +43,15 @@ if __name__ == "__main__":
     #display_all_images(batch_size, train_dataloader)
     
     
-    model = ViT(image_size=64, channel_size=1, patch_size=4, embed_size=64, nb_heads=8, classes=10, nb_layers=7, hidden_size=256, dropout=0.05).to(device)
+    model = ViT(image_size=28, channel_size=1, patch_size=4, embed_size=512, nb_heads=8, classes=28, nb_layers=3, hidden_size=256, dropout=0.2).to(device)
     print(model)
-    model.load_state_dict(state_dict=torch.load('./model_save.pt'))
+    #model.load_state_dict(state_dict=torch.load('./model_save.pt'))
     
     loss_fct = torch.nn.NLLLoss()
     print(loss_fct)
     
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0008, weight_decay=1e-5)
+    optimizer = torch.optim.Adam(model.parameters(), 5e-5)
     print(optimizer)
-    
-    scheduler = StepLR(optimizer, step_size=90, gamma=0.85)  # Adjust step_size and gamma as needed
-    print(scheduler)
     
     # Liste pour conserver les valeurs de loss (rappel : on souhaite minimiser la valeur de loss)
     losses = []
@@ -71,7 +61,7 @@ if __name__ == "__main__":
 
     # 1 epoch correspond à un passage complet sur l'ensemble des données (les 60000 images !)
     # Le modèle va donc voir chaque image 10 fois
-    nb_epochs = 2500
+    nb_epochs = 10
     torch.cuda.empty_cache()
     print("Training starts")
     # Boucle permettant de faire nb_epochs passages sur l'ensemble des données
@@ -89,19 +79,15 @@ if __name__ == "__main__":
 
         # Boucle permettant de parcourir l'ensemble des données du DataLoader (les 60000 images !)
         # Chaque itération contient 32 images et labels comme défini lors de la création du DataLoader
-        for batch_idx, data in enumerate(train_dataloader):          
+        for batch_idx, (imgs, labels, tensor_labels) in enumerate(train_dataloader):
   
             # Envoi des données sur le processeur choisi (CPU ou GPU)
-            imgs = data[0].to(device)
-            label_to_index = {label: index for index, label in enumerate(set(data[1]))}
-            # Convert string labels to tensor format
-            labels = torch.tensor([label_to_index[label] for label in data[1]]).to(device)
-            # Passage du batch d'images dans le modèle ViT conçu
-            # On obtient les prédictions directement en sortie (shape : [32, 10])
-            predictions = model(imgs) # Compléter ici (indice : un exemple de passage d'un batch dans le modèle a été donné à la toute fin du TP5)
+            imgs = imgs.to(device)
+            tensor_labels = tensor_labels.to(device)
+            # On obtient les prédictions directement en sortie 
+            predictions = model(imgs)
             # Comparaison des prédictions et des labels à l'aide de la fonction objectif
-            loss = loss_fct(predictions, labels) # Compléter ici (indice : vous avez simplement besoin de la fonction objectif définie plus haut, et de 2 paramètres)
-
+            loss = loss_fct(predictions, tensor_labels) # Compléter ici (indice : vous avez simplement besoin de la fonction objectif définie plus haut, et de 2 paramètres)
             # Nettoyage des anciens paramètres de mise à jour calculés
             optimizer.zero_grad()
 
@@ -116,7 +102,7 @@ if __name__ == "__main__":
             # L'indice de la probabilité la plus forte correspond au chiffre prédit par le réseau !
             # On ajoute les prédictions et les valeurs à prédire dans les listes correspondantes
             y_pred.extend(predictions.detach().argmax(dim=-1).tolist()) # Compléter ici (indice : on veut l'indice de la valeur maximale des éléments du tenseur pour chaque batch, une fonction PyTorch existe pour cela !)
-            y_true.extend(labels.detach().tolist())
+            y_true.extend(tensor_labels.detach().tolist())
 
             # Ajout de la valeur de loss du batch à la valeur de loss sur l'ensemble de l'epoch
             epoch_loss += loss.item()
@@ -140,9 +126,6 @@ if __name__ == "__main__":
         print("Epoch:", epoch)
         print("Loss:", epoch_loss)
         print(f"Accuracy: {accuracy} % ({total_correct} / {nb_imgs})")
-        
-        # Step the learning rate scheduler at the end of each epoch
-        scheduler.step()
         
     plt.plot(losses)
     plt.xlabel("Epoch")
