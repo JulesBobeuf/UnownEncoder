@@ -1,6 +1,11 @@
 import tkinter as tk
+
+import torch
+import torchvision
 from tkinter import filedialog
 from PIL import Image, ImageTk
+
+from ViT import ViT
 
 
 class TranslatorApp:
@@ -10,9 +15,32 @@ class TranslatorApp:
         """Init the translation application instance."""
         self.root = root
         self.root.title("Image Translator")
+        # self.root.iconbitmap("")
+        self.root.geometry("600x600")
         self.image_path = ""
+        self.lbl_image = None
         self.translated_text = tk.StringVar()
         self.input_text = tk.StringVar()
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = ViT(
+            image_size=28,
+            channel_size=1,
+            patch_size=4,
+            embed_size=512,
+            nb_heads=8,
+            classes=28,
+            nb_layers=3,
+            hidden_size=256,
+            dropout=0.2,
+        ).to(self.device)
+        self.model.load_state_dict(torch.load('./model_save.pt', map_location='cpu'))
+        self.model.eval()
+        self.vocab = {
+            0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I',
+            9: 'J', 10: 'K', 11: 'L', 12: 'M', 13: 'N', 14: 'O', 15: 'P', 16: 'Q',
+            17: 'R', 18: 'S', 19: 'T', 20: 'U', 21: 'V', 22: 'W', 23: 'X', 24: 'Y',
+            25: 'Z', 26: '?', 27: '@'
+        }
 
     def create_widgets(self):
         """Create the widgets."""
@@ -43,32 +71,37 @@ class TranslatorApp:
         ...
 
     def load_image(self):
+        """Load the image."""
         file_path = filedialog.askopenfilename(filetypes=[
             (
                 "Image files",
-                "*.png;*jpg;*jpeg;*.gif",
+                "*.png ; *jpg ; *jpeg ; *.gif",
             )
         ])
         if file_path:
+            if self.lbl_image:
+                self.lbl_image.destroy()
             self.image_path = file_path
             img = Image.open(file_path)
             img.thumbnail((300, 300))
             img = ImageTk.PhotoImage(img)
-            lbl_image = tk.Label(self.root, image=img)
-            lbl_image.image = img
-            lbl_image.pack(pady=10)
+            self.lbl_image = tk.Label(self.root, image=img)
+            self.lbl_image.image = img
+            self.lbl_image.pack(pady=10)
 
     def translate_unown_to_roman(self):
+        """Translate the unowned letters to roman letters."""
         if self.image_path:
-            translated_text = translate_unown_to_roman_function(self.image_path)
+            translated_text = self.predict_letter()
             self.translated_text.set(translated_text)
         else:
             tk.messagebox.showwarning("Warning", "Please upload an image first.")
 
     def translate_roman_to_unown(self):
+        """Translate the roman letters to unowned letters."""
         input_text = self.input_text.get()
         if input_text:
-            translated_image_path = translate_roman_to_unown_function(input_text)
+            translated_image_path = input_text
             if translated_image_path:
                 img = Image.open(translated_image_path)
                 img.thumbnail((300, 300))
@@ -81,12 +114,22 @@ class TranslatorApp:
         else:
             tk.messagebox.showwarning("Warning", "Please enter roman text to translate.")
 
+    def preprocess_image(self, transform):
+        """Preprocess the image."""
+        image = Image.open(self.image_path).convert('L')
+        input_image = transform(image)
+        input_image = input_image.unsqueeze(0)
+        return input_image
 
-def translate_unown_to_roman_function(image_path):
-    # TODO Implements yet
-    return ""
-
-
-def translate_roman_to_unown_function(text):
-    # TODO Implements yet
-    return ""
+    def predict_letter(self):
+        """Predict letter."""
+        transform = torchvision.transforms.Compose([
+            torchvision.transforms.Resize((28, 28)),
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize(0.5, std=0.5)
+        ])
+        input_image = self.preprocess_image(transform)
+        with torch.no_grad():
+            prediction = self.model(input_image)
+        predicted_index = torch.argmax(prediction, dim=1).item()
+        return self.vocab[predicted_index]
