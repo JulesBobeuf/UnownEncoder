@@ -33,7 +33,7 @@ class TranslatorApp:
             hidden_size=256,
             dropout=0.2,
         ).to(self.device)
-        self.model.load_state_dict(torch.load('./model_save.pt', map_location='cpu'))
+        self.model.load_state_dict(torch.load('./model_save.pt', map_location=self.device))
         self.model.eval()
         self.vocab = {
             0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I',
@@ -45,7 +45,7 @@ class TranslatorApp:
     def create_widgets(self):
         """Create the widgets."""
         entry_text = tk.Entry(self.root, textvariable=self.input_text, width=30)
-        entry_text.pack(pady=10)
+        # entry_text.pack(pady=10)
         btn_load_image = tk.Button(
             self.root,
             text="Load an image",
@@ -64,7 +64,7 @@ class TranslatorApp:
         lbl_translated_result = tk.Label(self.root, textvariable=self.translated_text)
         btn_load_image.pack(pady=10)
         btn_translate_unown_to_roman.pack(pady=10)
-        btn_translate_roman_to_unown.pack(pady=10)
+        # btn_translate_roman_to_unown.pack(pady=10)
         lbl_translated_result.pack(pady=10)
 
     def input_text(self):
