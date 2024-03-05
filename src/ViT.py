@@ -55,6 +55,3 @@ class ViT(torch.nn.Module):
         fwd_softmax = torch.nn.functional.log_softmax(fwd_classifier, dim=1)
         
         return fwd_softmax
-
-model = ViT(image_size=28, channel_size=1, patch_size=7, embed_size=512, nb_heads=8, classes=10, nb_layers=3, hidden_size=256, dropout=0.2).to(device)
-print(model)
