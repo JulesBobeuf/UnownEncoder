@@ -39,7 +39,7 @@ class TranslatorApp:
             0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I',
             9: 'J', 10: 'K', 11: 'L', 12: 'M', 13: 'N', 14: 'O', 15: 'P', 16: 'Q',
             17: 'R', 18: 'S', 19: 'T', 20: 'U', 21: 'V', 22: 'W', 23: 'X', 24: 'Y',
-            25: 'Z', 26: '?', 27: '@'
+            25: 'Z', 26: '?', 27: '!'
         }
 
     def create_widgets(self):
@@ -114,22 +114,24 @@ class TranslatorApp:
         else:
             tk.messagebox.showwarning("Warning", "Please enter roman text to translate.")
 
-    def preprocess_image(self, transform):
-        """Preprocess the image."""
-        image = Image.open(self.image_path).convert('L')
-        input_image = transform(image)
-        input_image = input_image.unsqueeze(0)
-        return input_image
-
     def predict_letter(self):
         """Predict letter."""
         transform = torchvision.transforms.Compose([
-            torchvision.transforms.Resize((28, 28)),
             torchvision.transforms.ToTensor(),
+            torchvision.transforms.Resize((28, 28)),
             torchvision.transforms.Normalize(0.5, std=0.5)
         ])
-        input_image = self.preprocess_image(transform)
-        with torch.no_grad():
-            prediction = self.model(input_image)
-        predicted_index = torch.argmax(prediction, dim=1).item()
-        return self.vocab[predicted_index]
+        image = Image.open(self.image_path).convert('L')
+        width, height = image.size
+        tensor_image = transform(image)
+        result = ""
+
+        # every image is of width 28. We can logically split it every 28 pixels
+        for i in range(0,width//28,1):
+            crt_img = tensor_image[:, 28*i:(i+1)*28]
+            crt_img = crt_img.unsqueeze(0)
+            with torch.no_grad():
+                prediction = self.model(crt_img.to(self.device))
+            predicted_index = torch.argmax(prediction, dim=1).item()
+            result += self.vocab[predicted_index]
+        return result
