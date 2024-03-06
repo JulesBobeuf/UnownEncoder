@@ -48,28 +48,36 @@ class TranslatorApp:
     def create_widgets(self):
         """Create the widgets."""
         entry_text = tk.Entry(
-            self.root, textvariable=self.input_text, width=30)
+            self.root, textvariable=self.input_text, width=30, font=("Helvetica", 12), justify='center')
         entry_text.pack(pady=10)
+
+        btn_translate_roman_to_unown = tk.Button(
+            self.root,
+            text="Translate text to unown letters",
+            command=self.translate_text_to_unown,
+        )
+        btn_translate_roman_to_unown.pack(pady=10)
+
+        lbl_title = tk.Label(
+            self.root, text="Unown Letters Application", font=("Helvetica", 20, "bold"), fg="#eb4034")
+        lbl_title.pack(pady=50)
+
         btn_load_image = tk.Button(
             self.root,
             text="Load an image",
             command=self.load_image,
         )
+        btn_load_image.pack(pady=10)
+
         btn_translate_unown_to_roman = tk.Button(
             self.root,
-            text="Translate Unown letters to roman letters",
+            text="Translate Unown letters to text",
             command=self.translate_unown_to_roman,
         )
-        btn_translate_roman_to_unown = tk.Button(
-            self.root,
-            text="Translate roman letters to unown letters",
-            command=self.translate_text_to_unown,
-        )
+        btn_translate_unown_to_roman.pack(pady=10)
+
         lbl_translated_result = tk.Label(
             self.root, textvariable=self.translated_text)
-        btn_load_image.pack(pady=10)
-        btn_translate_unown_to_roman.pack(pady=10)
-        btn_translate_roman_to_unown.pack(pady=10)
         lbl_translated_result.pack(pady=10)
 
     def load_image(self):
@@ -107,12 +115,15 @@ class TranslatorApp:
             unown_images = []
 
             for char in input_text.upper():
-                image_filename = self.get_image_filename(char)
-                image_path = os.path.join(
-                    "./data/images-from-dataloader/", image_filename)
+                if char == ' ':
+                    unown_images.append(Image.new("L", (28, 28)))
+                else:
+                    image_filename = self.get_image_filename(char)
+                    image_path = os.path.join(
+                        "./data/images-from-dataloader/", image_filename)
 
-                if os.path.exists(image_path):
-                    unown_images.append(Image.open(image_path))
+                    if os.path.exists(image_path):
+                        unown_images.append(Image.open(image_path))
 
             if unown_images:
                 final_width = len(unown_images) * 28
