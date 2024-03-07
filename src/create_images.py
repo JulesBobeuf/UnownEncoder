@@ -9,14 +9,14 @@ import os
 import string
 
 
-def create_images(batch_size, train_dataloader, save_path="data/images-from-dataloader/"):
+def create_images(batch_size, test_dataloader, save_path="data/images-from-dataloader/"):
     os.makedirs(save_path, exist_ok=True)
 
     alphabet_set = set(string.ascii_uppercase)
     alphabet_set.add("?")
     alphabet_set.add("!")
 
-    for batch_idx, (imgs, labels, tensor_labels) in enumerate(train_dataloader):
+    for batch_idx, (imgs, labels, tensor_labels) in enumerate(test_dataloader):
         for i in range(batch_size):
             img = imgs[i][0].numpy()
             label = labels[i]
@@ -24,7 +24,7 @@ def create_images(batch_size, train_dataloader, save_path="data/images-from-data
             if label in alphabet_set:
                 alphabet_set.remove(label)
 
-                if label == "!":
+                if label == "!" or label == "@":
                     filename = f"Exclamation.png"
                 if label == "?":
                     filename = f"Question.png"
@@ -48,13 +48,13 @@ if __name__ == "__main__":
         (28, 28)), torchvision.transforms.Normalize(0.5, std=0.5)])
     print(transform)
 
-    train_dataset = UnownDataset(
-        "./data/X_train.npy", "./data/Y_train.npy", transform=transform)
-    print('Number of train images:', len(train_dataset))
+    test_dataset = UnownDataset(
+        "./data/X_test.npy", "./data/Y_test.npy", transform=transform)
+    print('Number of test images:', len(test_dataset))
 
-    train_dataloader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True)
-    print(train_dataloader)
+    test_dataloader = DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=True)
+    print(test_dataloader)
 
-    create_images(batch_size, train_dataloader,
+    create_images(batch_size, test_dataloader,
                   save_path="./data/images-from-dataloader/")

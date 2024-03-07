@@ -28,6 +28,9 @@ def display_all_images(batch_size, train_dataloader):
 
 if __name__ == "__main__":
     batch_size = 4
+    model_path = './model_save.pt'
+    nb_epochs = 2
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)  
     
@@ -45,13 +48,16 @@ if __name__ == "__main__":
     
     model = ViT(image_size=28, channel_size=1, patch_size=4, embed_size=512, nb_heads=8, classes=28, nb_layers=3, hidden_size=256, dropout=0.2).to(device)
     print(model)
-    #model.load_state_dict(state_dict=torch.load('./model_save.pt'))
+    
+    optimizer = torch.optim.Adam(model.parameters(), 5e-5)
+    print(optimizer)
     
     loss_fct = torch.nn.NLLLoss()
     print(loss_fct)
     
-    optimizer = torch.optim.Adam(model.parameters(), 5e-5)
-    print(optimizer)
+    checkpoint = torch.load(model_path, map_location=torch.device(device))
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     
     # Liste pour conserver les valeurs de loss (rappel : on souhaite minimiser la valeur de loss)
     losses = []
@@ -59,9 +65,6 @@ if __name__ == "__main__":
     accuracies = []
     # Ces listes permettront d'afficher les courbes de loss et de précision après l'entrainement
 
-    # 1 epoch correspond à un passage complet sur l'ensemble des données (les 60000 images !)
-    # Le modèle va donc voir chaque image 10 fois
-    nb_epochs = 10
     torch.cuda.empty_cache()
     print("Training starts")
     # Boucle permettant de faire nb_epochs passages sur l'ensemble des données
@@ -137,4 +140,7 @@ if __name__ == "__main__":
     plt.ylabel("Train accuracy (%)")
     plt.show()
     
-    torch.save(model.state_dict(), './model_save.pt')
+    torch.save({
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+}, model_path)
