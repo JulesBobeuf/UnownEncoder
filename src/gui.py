@@ -2,6 +2,7 @@ import tkinter as tk
 
 import torch
 import torchvision
+import numpy as np
 from tkinter import filedialog
 from PIL import Image, ImageTk
 
@@ -15,7 +16,7 @@ class TranslatorApp:
     def __init__(self, root):
         """Init the translation application instance."""
         self.root = root
-        self.root.title("Image Translator")
+        self.root.title("UnownEncoder")
         # self.root.iconbitmap("")
         self.root.geometry("600x600")
         self.image_path = ""
@@ -24,6 +25,7 @@ class TranslatorApp:
         self.input_text = tk.StringVar()
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
+        self.model_path = './model_save.pt'
         self.model = ViT(
             image_size=28,
             channel_size=1,
@@ -35,8 +37,7 @@ class TranslatorApp:
             hidden_size=256,
             dropout=0.2,
         ).to(self.device)
-        self.model.load_state_dict(torch.load(
-            './model_save.pt', map_location=self.device))
+        self.model.load_state_dict(torch.load(self.model_path, map_location=torch.device(self.device))["model_state_dict"])
         self.model.eval()
         self.vocab = {
             0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I',
@@ -170,21 +171,28 @@ class TranslatorApp:
     def predict_letter(self):
         """Predict letter."""
         transform = torchvision.transforms.Compose([
-            torchvision.transforms.ToTensor(),
             torchvision.transforms.Resize((28, 28)),
             torchvision.transforms.Normalize(0.5, std=0.5)
         ])
         image = Image.open(self.image_path).convert('L')
         width, height = image.size
-        tensor_image = transform(image)
+        numpy_image = np.array(image)
+        
+        # Add channel dimension for grayscale image
+        numpy_image = np.expand_dims(numpy_image, axis=-1)
+        
+        tensor_image = torch.from_numpy(numpy_image).float()
         result = ""
 
         # every image is of width 28. We can logically split it every 28 pixels
-        for i in range(0, width // 28, 1):
-            crt_img = tensor_image[:, 28 * i:(i + 1) * 28]
+        for i in range(0,width//28,1):
+            crt_img = tensor_image[:, 28*i:(i+1)*28]
+            crt_img = crt_img.permute(2, 0, 1)  # Change channel order to (C, H, W)
             crt_img = crt_img.unsqueeze(0)
+            crt_img = transform(crt_img)
+            crt_img = crt_img.repeat(4, 1, 1, 1)
             with torch.no_grad():
                 prediction = self.model(crt_img.to(self.device))
-            predicted_index = torch.argmax(prediction, dim=1).item()
+            predicted_index = round(torch.mean(torch.argmax(prediction, dim=1).float(), dim=0).item())
             result += self.vocab[predicted_index]
         return result

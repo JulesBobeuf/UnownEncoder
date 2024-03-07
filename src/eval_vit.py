@@ -5,8 +5,10 @@ from UnownDataset import UnownDataset
 from ViT import ViT
 
 if __name__ == "__main__":
+    batch_size = 4
+    model_path = './model_save.pt'
+    nb_epochs = 2
     
-    batch_size = 10
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)  
     
@@ -20,7 +22,8 @@ if __name__ == "__main__":
     print(test_dataloader)
     
     model = ViT(image_size=28, channel_size=1, patch_size=4, embed_size=512, nb_heads=8, classes=28, nb_layers=3, hidden_size=256, dropout=0.2).to(device)
-    model.load_state_dict(state_dict=torch.load('./model_save.pt', map_location=device))
+    checkpoint = torch.load(model_path, map_location=torch.device(device))
+    model.load_state_dict(checkpoint['model_state_dict'])
     print(model)
     
     loss_fct = torch.nn.NLLLoss()
