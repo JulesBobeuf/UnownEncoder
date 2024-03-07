@@ -37,7 +37,7 @@ class TranslatorApp:
             hidden_size=256,
             dropout=0.2,
         ).to(self.device)
-        self.model.load_state_dict(torch.load(self.model_path, map_location=torch.device(self.device))["model_state_dict"])
+        self.model.load_state_dict(torch.load(self.model_path, map_location=torch.device(self.device)))
         self.model.eval()
         self.vocab = {
             0: 'A', 1: 'H', 2: 'O', 3: 'V', 4: 'B', 5: 'I', 6: 'P', 7: 'W', 8: 'C',
@@ -186,8 +186,8 @@ class TranslatorApp:
         result = ""
 
         # every image is of width 28. We can logically split it every 28 pixels
-        for i in range(0, width // 28, 1):
-            crt_img = tensor_image[:, 28 * i:(i + 1) * 28]
+        for i in range(0,width//28,1):
+            crt_img = tensor_image[:, 28*i:(i+1)*28]
             crt_img = crt_img.permute(2, 0, 1)  # Change channel order to (C, H, W)
             crt_img = crt_img.unsqueeze(0)
             crt_img = transform(crt_img)
