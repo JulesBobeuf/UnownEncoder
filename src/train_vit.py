@@ -29,7 +29,7 @@ def display_all_images(batch_size, train_dataloader):
 if __name__ == "__main__":
     batch_size = 4
     model_path = './model_save.pt'
-    nb_epochs = 1
+    nb_epochs = 5
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)  
