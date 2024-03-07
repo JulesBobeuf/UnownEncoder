@@ -137,6 +137,18 @@ class TranslatorApp:
                     x_position += 28
 
                 final_image.show()
+
+                # Save image
+                save_path = filedialog.asksaveasfilename(
+                    defaultextension=".png",
+                    filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
+                    title=f"Save Unown Image - {input_text}",
+                    initialfile=f"{input_text}_unown_image.png"
+                )
+
+                if save_path:
+                    final_image.save(save_path)
+
             else:
                 tk.messagebox.showwarning(
                     "Warning", "No images found for the input text.")
@@ -168,8 +180,8 @@ class TranslatorApp:
         result = ""
 
         # every image is of width 28. We can logically split it every 28 pixels
-        for i in range(0,width//28,1):
-            crt_img = tensor_image[:, 28*i:(i+1)*28]
+        for i in range(0, width // 28, 1):
+            crt_img = tensor_image[:, 28 * i:(i + 1) * 28]
             crt_img = crt_img.unsqueeze(0)
             with torch.no_grad():
                 prediction = self.model(crt_img.to(self.device))
