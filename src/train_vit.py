@@ -29,7 +29,7 @@ def display_all_images(batch_size, train_dataloader):
 if __name__ == "__main__":
     batch_size = 4
     model_path = './model_save.pt'
-    nb_epochs = 2
+    nb_epochs = 1
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)  
@@ -55,9 +55,9 @@ if __name__ == "__main__":
     loss_fct = torch.nn.NLLLoss()
     print(loss_fct)
     
-    checkpoint = torch.load(model_path, map_location=torch.device(device))
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    #checkpoint = torch.load(model_path, map_location=torch.device(device))
+    #model.load_state_dict(checkpoint['model_state_dict'])
+    #optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     
     # Liste pour conserver les valeurs de loss (rappel : on souhaite minimiser la valeur de loss)
     losses = []
