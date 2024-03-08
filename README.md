@@ -6,6 +6,7 @@ Unowns are hieroglyph-like, thin, black ancient Pokémon. There are 28 forms of 
 ## Note
 
 The `model_save.pt` file might not be compatible on all operating systems. You may need to re-create one by running `src/train_vit.py`. In this scenario, make sure to not call the current `model_save.pt` in the program.
+
 The initial dataset labels are delayed. Due to this, we must map by hand the classes based on the index.
 
 ## Installation
