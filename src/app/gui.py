@@ -36,6 +36,7 @@ class TranslatorApp:
                 hidden_size=constants.HIDDEN_SIZE, 
                 dropout=constants.DROPOUT).to(constants.DEVICE)
         self.model.load_state_dict(torch.load(constants.MODEL_PATH, map_location=torch.device(constants.DEVICE)))
+        self.model.eval()
         self.vocab = {
             0: 'A', 1: 'H', 2: 'O', 3: 'V', 4: 'B', 5: 'I', 6: 'P', 7: 'W', 8: 'C',
             9: 'J', 10: 'Q', 11: 'X', 12: 'D', 13: 'K', 14: 'R', 15: 'Y', 16: 'E',
