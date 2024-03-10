@@ -1,6 +1,6 @@
 import torch
 
-from MultiHeadAttention import MultiHeadAttention
+from model.MultiHeadAttention import MultiHeadAttention
 
 class VisionEncoder(torch.nn.Module):
     def __init__(self, embed_size, num_heads, hidden_size, dropout):
