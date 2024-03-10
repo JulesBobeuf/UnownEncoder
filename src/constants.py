@@ -19,4 +19,5 @@ NB_EPOCH:int = 3
 #transform
 TRANSFORM:torchvision.transforms = torchvision.transforms.Compose([torchvision.transforms.Resize((28, 28)), torchvision.transforms.Normalize(0.5, std=0.5)])
 
+#device
 DEVICE:str = torch.device("cuda" if torch.cuda.is_available() else "cpu")
