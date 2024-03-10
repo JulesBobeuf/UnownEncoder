@@ -9,6 +9,9 @@ from PIL import Image, ImageTk
 from ViT import ViT
 import os
 
+import constants
+
+
 
 class TranslatorApp:
     """The translator application class."""
@@ -23,22 +26,16 @@ class TranslatorApp:
         self.lbl_image = None
         self.translated_text = tk.StringVar()
         self.input_text = tk.StringVar()
-        self.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu")
-        self.model_path = './model_save.pt'
-        self.model = ViT(
-            image_size=28,
-            channel_size=1,
-            patch_size=4,
-            embed_size=512,
-            nb_heads=8,
-            classes=28,
-            nb_layers=3,
-            hidden_size=256,
-            dropout=0.2,
-        ).to(self.device)
-        self.model.load_state_dict(torch.load(self.model_path, map_location=torch.device(self.device)))
-        self.model.eval()
+        self.model = ViT(image_size=constants.IMAGE_SIZE, 
+                channel_size=constants.CHANNEL_SIZE, 
+                patch_size=constants.PATCH_SIZE, 
+                embed_size=constants.EMBED_SIZE, 
+                nb_heads=constants.NB_HEADS, 
+                classes=constants.NB_CLASSES, 
+                nb_layers=constants.NB_LAYERS, 
+                hidden_size=constants.HIDDEN_SIZE, 
+                dropout=constants.DROPOUT).to(constants.DEVICE)
+        self.model.load_state_dict(torch.load(constants.MODEL_PATH, map_location=torch.device(constants.DEVICE)))
         self.vocab = {
             0: 'A', 1: 'H', 2: 'O', 3: 'V', 4: 'B', 5: 'I', 6: 'P', 7: 'W', 8: 'C',
             9: 'J', 10: 'Q', 11: 'X', 12: 'D', 13: 'K', 14: 'R', 15: 'Y', 16: 'E',
@@ -118,7 +115,7 @@ class TranslatorApp:
 
             for char in input_text.upper():
                 if char == ' ':
-                    unown_images.append(Image.new("L", (28, 28)))
+                    unown_images.append(Image.new("L", (constants.IMAGE_SIZE, constants.IMAGE_SIZE)))
                 else:
                     image_filename = self.get_image_filename(char)
                     image_path = os.path.join(
@@ -128,15 +125,15 @@ class TranslatorApp:
                         unown_images.append(Image.open(image_path))
 
             if unown_images:
-                final_width = len(unown_images) * 28
-                final_height = 28
+                final_width = len(unown_images) * constants.IMAGE_SIZE
+                final_height = constants.IMAGE_SIZE
 
                 final_image = Image.new("L", (final_width, final_height))
 
                 x_position = 0
                 for unown_img in unown_images:
                     final_image.paste(unown_img, (x_position, 0))
-                    x_position += 28
+                    x_position += constants.IMAGE_SIZE
 
                 final_image.show()
 
@@ -171,10 +168,6 @@ class TranslatorApp:
 
     def predict_letter(self):
         """Predict letter."""
-        transform = torchvision.transforms.Compose([
-            torchvision.transforms.Resize((28, 28)),
-            torchvision.transforms.Normalize(0.5, std=0.5)
-        ])
         image = Image.open(self.image_path).convert('L')
         width, height = image.size
         numpy_image = np.array(image)
@@ -185,15 +178,15 @@ class TranslatorApp:
         tensor_image = torch.from_numpy(numpy_image).float()
         result = ""
 
-        # every image is of width 28. We can logically split it every 28 pixels
-        for i in range(0,width//28,1):
-            crt_img = tensor_image[:, 28*i:(i+1)*28]
+        # every image is of width constants.IMAGE_SIZE. We can logically split it every constants.IMAGE_SIZE pixels
+        for i in range(0,width//constants.IMAGE_SIZE,1):
+            crt_img = tensor_image[:, constants.IMAGE_SIZE*i:(i+1)*constants.IMAGE_SIZE]
             crt_img = crt_img.permute(2, 0, 1)  # Change channel order to (C, H, W)
             crt_img = crt_img.unsqueeze(0)
-            crt_img = transform(crt_img)
+            crt_img = constants.TRANSFORM(crt_img)
             crt_img = crt_img.repeat(4, 1, 1, 1)
             with torch.no_grad():
-                prediction = self.model(crt_img.to(self.device))
+                prediction = self.model(crt_img.to(constants.DEVICE))
             predicted_index = round(torch.mean(torch.argmax(prediction, dim=1).float(), dim=0).item())
             result += self.vocab[predicted_index]
         return result

@@ -6,6 +6,8 @@ from UnownDataset import UnownDataset
 from ViT import ViT
 from torch.optim.lr_scheduler import StepLR
 
+import constants
+
 def display_all_images(batch_size, train_dataloader):
     rows = 7  # Number of rows in the subplot grid
     cols = 7  # Number of columns in the subplot grid
@@ -27,27 +29,27 @@ def display_all_images(batch_size, train_dataloader):
     plt.show()
 
 if __name__ == "__main__":
-    batch_size = 4
-    model_path = './model_save.pt'
-    nb_epochs = 3
+    print(constants.TRANSFORM) 
     
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(device)  
-    
-    transform = torchvision.transforms.Compose([torchvision.transforms.Resize((28, 28)), torchvision.transforms.Normalize(0.5, std=0.5)])
-    print(transform) 
-    
-    train_dataset = UnownDataset("./data/X_train.npy", "./data/Y_train.npy", transform=transform)
+    train_dataset = UnownDataset("./data/X_train.npy", "./data/Y_train.npy", transform=constants.TRANSFORM)
     print('Number of train images:', len(train_dataset))
     
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=constants.BATCH_SIZE, shuffle=True)
     print(train_dataloader)
     
     #display_all_images(batch_size, train_dataloader)
     
     
-    model = ViT(image_size=28, channel_size=1, patch_size=4, embed_size=512, nb_heads=8, classes=28, nb_layers=3, hidden_size=256, dropout=0.2).to(device)
-    model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
+    model = ViT(image_size=constants.IMAGE_SIZE, 
+                channel_size=constants.CHANNEL_SIZE, 
+                patch_size=constants.PATCH_SIZE, 
+                embed_size=constants.EMBED_SIZE, 
+                nb_heads=constants.NB_HEADS, 
+                classes=constants.NB_CLASSES, 
+                nb_layers=constants.NB_LAYERS, 
+                hidden_size=constants.HIDDEN_SIZE, 
+                dropout=constants.DROPOUT).to(constants.DEVICE)
+    model.load_state_dict(torch.load(constants.MODEL_PATH, map_location=torch.device(constants.DEVICE)))
     print(model)
     
     optimizer = torch.optim.Adam(model.parameters(), 5e-5)
@@ -62,7 +64,7 @@ if __name__ == "__main__":
     torch.cuda.empty_cache()
     print("Training starts")
     # loop allow to go nb_epochs times over the dataset
-    for epoch in range(nb_epochs):
+    for epoch in range(constants.NB_EPOCH):
         model.train()
 
         epoch_loss = 0
@@ -74,8 +76,8 @@ if __name__ == "__main__":
 
         for batch_idx, (imgs, labels, tensor_labels) in enumerate(train_dataloader):
             
-            imgs = imgs.to(device)
-            tensor_labels = tensor_labels.to(device)
+            imgs = imgs.to(constants.DEVICE)
+            tensor_labels = tensor_labels.to(constants.DEVICE)
             
             predictions = model(imgs)
             loss = loss_fct(predictions, tensor_labels)
@@ -117,4 +119,4 @@ if __name__ == "__main__":
     plt.ylabel("Train accuracy (%)")
     plt.show()
     
-    torch.save(model.state_dict(), model_path)
+    torch.save(model.state_dict(), constants.MODEL_PATH)

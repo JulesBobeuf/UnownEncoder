@@ -1,8 +1,6 @@
 import torch
 from VisionEncoder import VisionEncoder
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(device) 
+import constants
 
 class ViT(torch.nn.Module):
     def __init__(self, image_size, channel_size, patch_size, embed_size, nb_heads, classes, nb_layers, hidden_size, dropout):
@@ -39,11 +37,11 @@ class ViT(torch.nn.Module):
         fwd_embeddings = self.embedding(img_torch_reshape)
         
         b,n,e = fwd_embeddings.size()
-        class_token = torch.randn(b,1,e).to(device)
-        fwd_cat_class_token = torch.cat((fwd_embeddings, class_token),1).to(device)
+        class_token = torch.randn(b,1,e).to(constants.DEVICE)
+        fwd_cat_class_token = torch.cat((fwd_embeddings, class_token),1).to(constants.DEVICE)
         
-        fwd_pos_encoding = (fwd_cat_class_token+ self.positional_encoding).to(device)
-        fwd_dropout = self.dropout_layer(fwd_pos_encoding).to(device)
+        fwd_pos_encoding = (fwd_cat_class_token+ self.positional_encoding).to(constants.DEVICE)
+        fwd_dropout = self.dropout_layer(fwd_pos_encoding).to(constants.DEVICE)
         x = fwd_dropout
         for encoder in self.encoders:
             x = encoder(x)

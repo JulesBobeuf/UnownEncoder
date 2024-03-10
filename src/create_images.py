@@ -7,7 +7,7 @@ from ViT import ViT
 from torch.optim.lr_scheduler import StepLR
 import os
 import string
-
+import constants
 
 def create_images(batch_size, test_dataloader, save_path="data/images-from-dataloader/"):
     os.makedirs(save_path, exist_ok=True)
@@ -40,21 +40,14 @@ def create_images(batch_size, test_dataloader, save_path="data/images-from-datal
 
 
 if __name__ == "__main__":
-    batch_size = 4
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(device)
-
-    transform = torchvision.transforms.Compose([torchvision.transforms.Resize(
-        (28, 28)), torchvision.transforms.Normalize(0.5, std=0.5)])
-    print(transform)
 
     test_dataset = UnownDataset(
-        "./data/X_test.npy", "./data/Y_test.npy", transform=transform)
+        "./data/X_test.npy", "./data/Y_test.npy", transform=constants.TRANSFORM)
     print('Number of test images:', len(test_dataset))
 
     test_dataloader = DataLoader(
-        test_dataset, batch_size=batch_size, shuffle=True)
+        test_dataset, batch_size=constants.BATCH_SIZE, shuffle=True)
     print(test_dataloader)
 
-    create_images(batch_size, test_dataloader,
+    create_images(constants.BATCH_SIZE, test_dataloader,
                   save_path="./data/images-from-dataloader/")
