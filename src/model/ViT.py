@@ -1,6 +1,6 @@
 import torch
-from VisionEncoder import VisionEncoder
-import constants
+from model.VisionEncoder import VisionEncoder
+import utils.constants as constants
 
 class ViT(torch.nn.Module):
     def __init__(self, image_size, channel_size, patch_size, embed_size, nb_heads, classes, nb_layers, hidden_size, dropout):

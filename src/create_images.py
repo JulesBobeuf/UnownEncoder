@@ -2,12 +2,12 @@ import torch  # https://pytorch.org/docs/stable/index.html
 import torchvision  # https://pytorch.org/vision/stable/index.html
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-from UnownDataset import UnownDataset
-from ViT import ViT
+from model.UnownDataset import UnownDataset
+from model.ViT import ViT
 from torch.optim.lr_scheduler import StepLR
 import os
 import string
-import constants
+import utils.constants as constants
 
 def create_images(batch_size, test_dataloader, save_path="data/images-from-dataloader/"):
     os.makedirs(save_path, exist_ok=True)

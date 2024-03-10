@@ -1,10 +1,10 @@
 import torch            # https://pytorch.org/docs/stable/index.html
 import torchvision      # https://pytorch.org/vision/stable/index.html
 from torch.utils.data import DataLoader
-from UnownDataset import UnownDataset
-from ViT import ViT
+from model.UnownDataset import UnownDataset
+from model.ViT import ViT
 
-import constants
+import utils.constants as constants
 
 if __name__ == "__main__":
     print(constants.DEVICE)  
