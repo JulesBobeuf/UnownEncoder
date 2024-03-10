@@ -1,5 +1,4 @@
 import torch            # https://pytorch.org/docs/stable/index.html
-import torchvision      # https://pytorch.org/vision/stable/index.html
 from torch.utils.data import DataLoader
 from model.UnownDataset import UnownDataset
 from model.ViT import ViT

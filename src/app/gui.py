@@ -6,10 +6,10 @@ import numpy as np
 from tkinter import filedialog
 from PIL import Image, ImageTk
 
-from ViT import ViT
+from model.ViT import ViT
 import os
 
-import constants
+import utils.constants as constants
 
 
 

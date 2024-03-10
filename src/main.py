@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from gui import TranslatorApp
+from app.gui import TranslatorApp
 
 if __name__ == "__main__":
     root = tk.Tk()
