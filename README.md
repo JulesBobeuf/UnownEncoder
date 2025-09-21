@@ -1,50 +1,121 @@
-# UnownEncoder
+<a id="readme-top"></a>
 
-UnownEncoder allows you to encrypt latin text to the unown language and vice versa.
-Unowns are hieroglyph-like, thin, black ancient Pokémon. There are 28 forms of Unown: one for each of the 26 letters in the Latin alphabet, a question mark and an exclamation mark. 
+<div align="center">
+  <h1 align="center">UnownEncoder</h1>
+  <img src="assets\all-letters.png" alt="Unown Encoder Screenshot" width="600">
+  <p align="center">
+    Encode and decode text into Unown language using Python and AI.
+    <br />
+    <a href="https://github.com/JulesBobeuf/UnownEncoder">View on GitHub</a>
+  </p>
+</div>
 
-## Note
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li><a href="#built-with">Built With</a></li>
+    <li><a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#folder-structure">Folder Structure</a></li>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#available-scripts">Available Scripts</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</details>
 
-The `model_save.pt` file might not be compatible on all operating systems. You may need to re-create one by running `src/train_vit.py`. In this scenario, make sure to not call the current `model_save.pt` in the program.
+## About The Project
 
-The initial dataset labels are delayed. Due to this, we must map by hand the classes based on the index.
+UnownEncoder is a Python-based tool that utilizes AI to convert Latin text into the Unown language from Pokémon. It supports both encoding and decoding functionalities, allowing for seamless translation between standard text and Unown symbols.
 
-## Installation
+## Built With
 
-The following guide is based on Linux. On other operating systems like Windows, some commands may slightly change (ex: `python` instead of `python3`)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)  
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)  
+[![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/)  
+[![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=for-the-badge&logo=matplotlib&logoColor=white)](https://matplotlib.org/)
+[![Tkinter](https://img.shields.io/badge/Tkinter-FF6F00?style=for-the-badge)](https://docs.python.org/3/library/tkinter.html)
 
-```shell
-git clone https://github.com/JulesBobeuf/UnownEncoder.git
-cd UnownEncoder
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+## Getting Started
+
+### Folder Structure
+
+```markdown
+UnownEncoder/
+├── 📁 data/             # Dataset for training
+├── 📁 src/              # Source code for app & model
+│   ├── 📁 app/          # GUI application code
+│   ├── 📁 model/        # Model architecture & weights
+│   ├── 📁 util/         # Helper functions and utilities
+│   ├── 📄 main.py       # GUI application entry point
+│   ├── 📄 train_vit.py  # Training script for the model
+├── 📄 model_save.pt     # Pre-trained model file
+├── 📄 requirements.txt  # Project dependencies
+├── 📄 LICENSE           # Project license
+└── 📄 README.md         # Project documentation
+
 ```
 
-## Run the application
+### Prerequisites
 
-```shell
-source .venv/bin/activate
-python3 src/main.py
+Ensure you have the following installed:
+
+```sh
+python == 3.9
+pip >= 21.0
 ```
 
-## Train the ViT model
+### Installation
 
-```shell
-source .venv/bin/activate
-python3 src/train_vit.py
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/JulesBobeuf/UnownEncoder.git
+   ```
+2. Navigate into the project directory:
+   ```sh
+   cd UnownEncoder
+   ```
+3. Create a virtual environment and activate it:
+   ```sh
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+4. Install dependencies:
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+### Available Scripts
+
+```sh
+python src/train_vit.py
+```
+Trains the Vision Transformer model for encoding/decoding tasks.
+
+## Usage
+
+Launch the application by running the main GUI file:
+
+```sh
+python src/main.py
 ```
 
-## Evaluate the ViT model
+This will open the Tkinter GUI, where you can:
 
-```shell
-source .venv/bin/activate
-python3 src/eval_vit.py
-```
+* Encode text into Unown language
+* Decode Unown language back to standard text
 
-## Potential future work :
+## License
 
-- Improve GUI
-- Improve code quality and readability
-- Improve code organization
-- Use a .env file for properties
+Licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+Jules Bobeuf  
+[LinkedIn](https://www.linkedin.com/in/bobeuf-jules/)  
+bobeuf.jules@gmail.com
