@@ -5,29 +5,8 @@
   <img src="assets\all-letters.png" alt="Unown Encoder Screenshot" width="600">
   <p align="center">
     Encode and decode text into Unown language using Python and AI.
-    <br />
-    <a href="https://github.com/JulesBobeuf/UnownEncoder">View on GitHub</a>
   </p>
 </div>
-
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li><a href="#about-the-project">About The Project</a></li>
-    <li><a href="#built-with">Built With</a></li>
-    <li><a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#folder-structure">Folder Structure</a></li>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-        <li><a href="#available-scripts">Available Scripts</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ol>
-</details>
 
 ## About The Project
 
@@ -38,7 +17,7 @@ UnownEncoder is a Python-based tool that utilizes AI to convert Latin text into 
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)  
 [![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)  
 [![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/)  
-[![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=for-the-badge&logo=matplotlib&logoColor=white)](https://matplotlib.org/)
+[![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=for-the-badge&logo=matplotlib&logoColor=white)](https://matplotlib.org/)  
 [![Tkinter](https://img.shields.io/badge/Tkinter-FF6F00?style=for-the-badge)](https://docs.python.org/3/library/tkinter.html)
 
 ## Getting Started
@@ -116,17 +95,14 @@ Licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
-Jules Bobeuf
-
+Jules Bobeuf  
 [LinkedIn](https://www.linkedin.com/in/bobeuf-jules/)  
 bobeuf.jules@gmail.com
 
-Aymeric Jakobowski
-
+Aymeric Jakobowski  
 [LinkedIn](https://www.linkedin.com/in/aymeric-jakobowski/)  
 [GitHub](https://github.com/AymericJak)
 
-Sébastien Coze
-
+Sébastien Coze  
 [LinkedIn](https://www.linkedin.com/in/sebastien-coze/)  
 [GitHub](https://github.com/SebastienCozeDev)
